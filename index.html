@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Graplay - 英文法ミニゲーム</title>
+  <audio id="click-sound" src="./sounds/カーソル移動12.mp3" preload="auto"></audio>
+
   <style>
     @font-face {
     font-family: 'Kola';
@@ -35,7 +37,7 @@
       animation: fadeIn 1s ease;
     }
     .title {
-      font-size: 7rem;
+      font-size: 4rem;
       margin-bottom: 1rem;
     }
     .description {
@@ -119,6 +121,13 @@
       document.getElementById('gameScreen').classList.remove('visible');
       document.getElementById('home').style.display = 'block';
     }
+    const clickSound = document.getElementById('click-sound');
+
+function playSound() {
+  clickSound.currentTime = 0; // 毎回最初から再生
+  clickSound.play();
+}
+
   </script>
 </body>
 </html>
