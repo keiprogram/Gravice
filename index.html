@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gravice - 英文法ミニゲーム</title>
+  <title>Graplay - 英文法ミニゲーム</title>
   <style>
     body {
       margin: 0;
@@ -16,12 +16,14 @@
       color: white;
       padding: 1rem;
       text-align: center;
+      animation: fadeInDown 1s ease;
     }
     .container {
       max-width: 800px;
       margin: 2rem auto;
       padding: 1rem;
       text-align: center;
+      animation: fadeIn 1s ease;
     }
     .title {
       font-size: 2rem;
@@ -41,10 +43,14 @@
       border-radius: 8px;
       font-size: 1rem;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: transform 0.2s ease, background-color 0.3s ease;
     }
     .game-button:hover {
       background-color: #257985;
+      transform: scale(1.05);
+    }
+    .game-button:active {
+      transform: scale(0.95);
     }
     .game-screen {
       display: none;
@@ -52,11 +58,19 @@
     .visible {
       display: block;
     }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Gravice</h1>
+    <h1>Graplay</h1>
     <p>ミニゲームで英文法を楽しく学ぼう！</p>
   </header>
 
