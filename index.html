@@ -1,17 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>My Simple Web App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Graplay - 英文法ミニゲーム</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background-color: #FFFFFF;
+      color: #257985;
+    }
+    header {
+      background-color: #257985;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      text-align: center;
+    }
+    .title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .description {
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .game-button {
+      display: inline-block;
+      background-color: #5EA8A7;
+      color: white;
+      padding: 1rem 2rem;
+      margin: 0.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .game-button:hover {
+      background-color: #257985;
+    }
+    .game-screen {
+      display: none;
+    }
+    .visible {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-  <h1>こんにちは</h1>
-  <button onclick="showMessage()">クリックしてね</button>
-  <p id="message"></p>
+  <header>
+    <h1>Graplay</h1>
+    <p>ミニゲームで英文法を楽しく学ぼう！</p>
+  </header>
+
+  <div class="container" id="home">
+    <div class="title">ゲームを選ぼう</div>
+    <div class="description">好きなゲームを選んで、英文法力をアップしよう！</div>
+    <button class="game-button" onclick="startGame('fillInBlank')">穴埋めタイムアタック</button>
+    <button class="game-button" onclick="startGame('grammarSniper')">文法スナイパー</button>
+    <button class="game-button" onclick="startGame('shuffleChallenge')">並び替えチャレンジ</button>
+    <button class="game-button" onclick="startGame('trueFalse')">〇×判定ゲーム</button>
+  </div>
+
+  <div class="container game-screen" id="gameScreen">
+    <div id="gameTitle" class="title"></div>
+    <div id="gameContent" class="description">（ここにゲーム内容が表示されます）</div>
+    <button class="game-button" onclick="goHome()">ホームに戻る</button>
+  </div>
 
   <script>
-    function showMessage() {
-      document.getElementById("message").textContent = "JavaScriptが動きました！";
+    function startGame(gameId) {
+      document.getElementById('home').style.display = 'none';
+      const gameScreen = document.getElementById('gameScreen');
+      gameScreen.classList.add('visible');
+
+      const titles = {
+        fillInBlank: '穴埋めタイムアタック',
+        grammarSniper: '文法スナイパー',
+        shuffleChallenge: '並び替えチャレンジ',
+        trueFalse: '〇×判定ゲーム'
+      };
+
+      document.getElementById('gameTitle').innerText = titles[gameId];
+      document.getElementById('gameContent').innerText = '（ここに「' + titles[gameId] + '」の問題が表示されます）';
+    }
+
+    function goHome() {
+      document.getElementById('gameScreen').classList.remove('visible');
+      document.getElementById('home').style.display = 'block';
     }
   </script>
 </body>
