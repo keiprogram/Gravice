@@ -2,18 +2,11 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gravite - 英文法ミニゲーム</title>
-  <audio id="click-sound" src="./sounds/click.mp3" preload="auto"></audio>
+  <audio id="click-sound" src="./sounds/カーソル移動12.mp3" preload="auto"></audio>
 
   <style>
-    :root {
-      --saltwater: #257985;
-      --lagoon: #5EA8A7;
-      --whitewash: #FFFFFF;
-      --raspberry: #FF4447;
-    }
-
     @font-face {
       font-family: 'Kola';
       src: url('./fonts/Kola-Regular.woff2') format('woff2'),
@@ -22,14 +15,16 @@
       font-style: normal;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --saltwater: #257985;
+      --lagoon: #5EA8A7;
+      --whitewash: #FFFFFF;
+      --raspberry: #FF4447;
     }
 
     body {
-      font-family: 'Kola', sans-serif;
+      margin: 0;
+      font-family: 'Kola', 'Arial', sans-serif;
       background-color: var(--whitewash);
       color: var(--saltwater);
       display: flex;
@@ -40,51 +35,43 @@
     header {
       background-color: var(--saltwater);
       color: var(--whitewash);
+      padding: 1rem;
       text-align: center;
-      padding: 2rem 1rem;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    header h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-    }
-
-    header p {
-      font-size: 1.2rem;
-      opacity: 0.9;
+      animation: fadeInDown 1s ease;
     }
 
     .container {
       flex: 1;
-      padding: 2rem 1rem;
       max-width: 800px;
-      margin: 0 auto;
+      margin: 2rem auto;
+      padding: 1rem;
       text-align: center;
+      animation: fadeIn 1s ease;
     }
 
     .title {
-      font-size: 2.5rem;
+      font-size: 3rem;
       margin-bottom: 1rem;
     }
 
     .description {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       margin-bottom: 2rem;
-      color: var(--saltwater);
     }
 
     .game-button {
-      display: inline-block;
+      display: block;
+      width: 90%;
+      max-width: 300px;
+      margin: 0.7rem auto;
       background-color: var(--lagoon);
       color: var(--whitewash);
+      padding: 1rem;
       border: none;
-      border-radius: 12px;
-      padding: 1rem 2rem;
-      margin: 0.5rem;
+      border-radius: 10px;
       font-size: 1.1rem;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: transform 0.2s ease, background-color 0.3s ease;
     }
 
     .game-button:hover {
@@ -104,20 +91,30 @@
       display: block;
     }
 
-    .back-button {
-      background-color: var(--raspberry);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    .back-button:hover {
-      background-color: #e13235;
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    footer {
-      text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
-      background-color: #f9f9f9;
-      color: #888;
+    /* 📱 スマホ・タブレット対応 */
+    @media (max-width: 600px) {
+      .title {
+        font-size: 2.2rem;
+      }
+
+      .description {
+        font-size: 1rem;
+      }
+
+      .game-button {
+        font-size: 1rem;
+        padding: 0.9rem;
+      }
     }
   </style>
 </head>
@@ -129,22 +126,18 @@
 
   <div class="container" id="home">
     <div class="title">ゲームを選ぼう</div>
-    <p class="description">好きなゲームで文法力アップ！</p>
-    <button class="game-button" onclick="playSound(); startGame('fillInBlank')">穴埋めタイムアタック</button>
-    <button class="game-button" onclick="playSound(); startGame('grammarSniper')">文法スナイパー</button>
-    <button class="game-button" onclick="playSound(); startGame('shuffleChallenge')">並び替えチャレンジ</button>
-    <button class="game-button" onclick="playSound(); startGame('trueFalse')">〇×判定ゲーム</button>
+    <div class="description">好きなゲームを選んで、英文法力をアップしよう！</div>
+    <button class="game-button" onclick="startGame('fillInBlank')">穴埋めタイムアタック</button>
+    <button class="game-button" onclick="startGame('grammarSniper')">文法スナイパー</button>
+    <button class="game-button" onclick="startGame('shuffleChallenge')">並び替えチャレンジ</button>
+    <button class="game-button" onclick="startGame('trueFalse')">〇×判定ゲーム</button>
   </div>
 
   <div class="container game-screen" id="gameScreen">
     <div id="gameTitle" class="title"></div>
     <div id="gameContent" class="description">（ここにゲーム内容が表示されます）</div>
-    <button class="game-button back-button" onclick="playSound(); goHome()">ホームに戻る</button>
+    <button class="game-button" onclick="goHome()">ホームに戻る</button>
   </div>
-
-  <footer>
-    © 2025 Gravite | 英文法ゲームアプリ
-  </footer>
 
   <script>
     const clickSound = document.getElementById('click-sound');
@@ -155,6 +148,7 @@
     }
 
     function startGame(gameId) {
+      playSound();
       document.getElementById('home').style.display = 'none';
       const gameScreen = document.getElementById('gameScreen');
       gameScreen.classList.add('visible');
@@ -167,10 +161,11 @@
       };
 
       document.getElementById('gameTitle').innerText = titles[gameId];
-      document.getElementById('gameContent').innerText = '（ここに「' + titles[gameId] + '」の問題が表示されます）';
+      document.getElementById('gameContent').innerText = `（ここに「${titles[gameId]}」の問題が表示されます）`;
     }
 
     function goHome() {
+      playSound();
       document.getElementById('gameScreen').classList.remove('visible');
       document.getElementById('home').style.display = 'block';
     }
