@@ -1,90 +1,154 @@
-<style>
-  :root {
-    --saltwater: #257985;
-    --lagoon: #5EA8A7;
-    --whitewash: #FFFFFF;
-    --raspberry: #FF4447;
-  }
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gravite - 英文法ミニゲーム</title>
+  <audio id="click-sound" src="./sounds/カーソル移動12.mp3" preload="auto"></audio>
 
-  body {
-    margin: 0;
-    font-family: 'Kola', 'Arial', sans-serif;
-    background-color: var(--whitewash);
-    color: var(--saltwater);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  header {
-    background-color: var(--saltwater);
-    color: var(--whitewash);
-    padding: 1rem;
-    text-align: center;
-  }
-
-  .container {
-    flex: 1;
-    max-width: 800px;
-    margin: 2rem auto;
-    padding: 1rem;
-    text-align: center;
-  }
-
-  .title {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-
-  .description {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-  }
-
-  .game-button {
-    display: block;
-    width: 90%;
-    max-width: 300px;
-    margin: 0.7rem auto;
-    background-color: var(--lagoon);
-    color: var(--whitewash);
-    padding: 1rem;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.3s ease;
-  }
-
-  .game-button:hover {
-    background-color: var(--raspberry);
-    transform: scale(1.05);
-  }
-
-  .game-button:active {
-    transform: scale(0.95);
-  }
-
-  .game-screen {
-    display: none;
-  }
-
-  .visible {
-    display: block;
-  }
-
-  @media (max-width: 600px) {
+  <style>
+    :root {
+      --saltwater: #257985;
+      --lagoon: #5EA8A7;
+      --whitewash: #FFFFFF;
+      --raspberry: #FF4447;
+    }
+  
+    body {
+      margin: 0;
+      font-family: 'Kola', 'Arial', sans-serif;
+      background-color: var(--whitewash);
+      color: var(--saltwater);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+  
+    header {
+      background-color: var(--saltwater);
+      color: var(--whitewash);
+      padding: 1rem;
+      text-align: center;
+    }
+  
+    .container {
+      flex: 1;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+      text-align: center;
+    }
+  
     .title {
-      font-size: 2.2rem;
+      font-size: 3rem;
+      margin-bottom: 1rem;
     }
-
+  
     .description {
-      font-size: 1rem;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+  
+    .game-button {
+      display: block;
+      width: 90%;
+      max-width: 300px;
+      margin: 0.7rem auto;
+      background-color: var(--lagoon);
+      color: var(--whitewash);
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.3s ease;
+    }
+  
+    .game-button:hover {
+      background-color: var(--raspberry);
+      transform: scale(1.05);
+    }
+  
+    .game-button:active {
+      transform: scale(0.95);
+    }
+  
+    .game-screen {
+      display: none;
+    }
+  
+    .visible {
+      display: block;
+    }
+  
+    @media (max-width: 600px) {
+      .title {
+        font-size: 2.2rem;
+      }
+  
+      .description {
+        font-size: 1rem;
+      }
+  
+      .game-button {
+        font-size: 1rem;
+        padding: 0.9rem;
+      }
+    }
+  </style>
+  
+</head>
+<body>
+  <header>
+    <h1>Gravite</h1>
+    <p>ミニゲームで英文法を楽しく学ぼう！</p>
+  </header>
+
+  <div class="container" id="home">
+    <div class="title">ゲームを選ぼう</div>
+    <div class="description">好きなゲームを選んで、英文法力をアップしよう！</div>
+    <button class="game-button" onclick="startGame('fillInBlank')">穴埋めタイムアタック</button>
+    <button class="game-button" onclick="startGame('grammarSniper')">文法スナイパー</button>
+    <button class="game-button" onclick="startGame('shuffleChallenge')">並び替えチャレンジ</button>
+    <button class="game-button" onclick="startGame('trueFalse')">〇×判定ゲーム</button>
+  </div>
+
+  <div class="container game-screen" id="gameScreen">
+    <div id="gameTitle" class="title"></div>
+    <div id="gameContent" class="description">（ここにゲーム内容が表示されます）</div>
+    <button class="game-button" onclick="goHome()">ホームに戻る</button>
+  </div>
+
+  <script>
+    const clickSound = document.getElementById('click-sound');
+
+    function playSound() {
+      clickSound.currentTime = 0;
+      clickSound.play();
     }
 
-    .game-button {
-      font-size: 1rem;
-      padding: 0.9rem;
+    function startGame(gameId) {
+      playSound();
+      document.getElementById('home').style.display = 'none';
+      const gameScreen = document.getElementById('gameScreen');
+      gameScreen.classList.add('visible');
+
+      const titles = {
+        fillInBlank: '穴埋めタイムアタック',
+        grammarSniper: '文法スナイパー',
+        shuffleChallenge: '並び替えチャレンジ',
+        trueFalse: '〇×判定ゲーム'
+      };
+
+      document.getElementById('gameTitle').innerText = titles[gameId];
+      document.getElementById('gameContent').innerText = `（ここに「${titles[gameId]}」の問題が表示されます）`;
     }
-  }
-</style>
+
+    function goHome() {
+      playSound();
+      document.getElementById('gameScreen').classList.remove('visible');
+      document.getElementById('home').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
