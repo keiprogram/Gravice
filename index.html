@@ -1,174 +1,119 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gravite - 英文法ミニゲーム</title>
-  <audio id="click-sound" src="./sounds/カーソル移動12.mp3" preload="auto"></audio>
+<style>
+  @font-face {
+    font-family: 'Kola';
+    src: url('./fonts/Kola-Regular.woff2') format('woff2'),
+         url('./fonts/Kola-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
 
-  <style>
-    @font-face {
-      font-family: 'Kola';
-      src: url('./fonts/Kola-Regular.woff2') format('woff2'),
-           url('./fonts/Kola-Regular.woff') format('woff');
-      font-weight: normal;
-      font-style: normal;
-    }
+  :root {
+    --saltwater: #257985;
+    --lagoon: #5EA8A7;
+    --whitewash: #FFFFFF;
+    --raspberry: #FF4447;
+  }
 
-    :root {
-      --saltwater: #257985;
-      --lagoon: #5EA8A7;
-      --whitewash: #FFFFFF;
-      --raspberry: #FF4447;
-    }
+  body {
+    margin: 0;
+    font-family: 'Kola', 'Arial', sans-serif;
+    background-color: var(--whitewash);
+    color: var(--saltwater);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
 
-    body {
-      margin: 0;
-      font-family: 'Kola', 'Arial', sans-serif;
-      background-color: var(--whitewash);
-      color: var(--saltwater);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
+  header {
+    background: linear-gradient(to right, var(--saltwater), var(--lagoon));
+    color: var(--whitewash);
+    padding: 1.5rem 1rem;
+    text-align: center;
+    animation: fadeInDown 1s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
 
-    header {
-      background-color: var(--saltwater);
-      color: var(--whitewash);
-      padding: 1rem;
-      text-align: center;
-      animation: fadeInDown 1s ease;
-    }
+  .container {
+    flex: 1;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    text-align: center;
+    animation: fadeIn 1s ease;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
 
-    .container {
-      flex: 1;
-      max-width: 800px;
-      margin: 2rem auto;
-      padding: 1rem;
-      text-align: center;
-      animation: fadeIn 1s ease;
-    }
+  .title {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--saltwater);
+  }
 
+  .description {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: var(--lagoon);
+  }
+
+  .game-button {
+    display: block;
+    width: 90%;
+    max-width: 300px;
+    margin: 0.7rem auto;
+    background: linear-gradient(to right, var(--lagoon), var(--raspberry));
+    color: var(--whitewash);
+    padding: 1rem;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease, background 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .game-button:hover {
+    background: linear-gradient(to right, var(--raspberry), var(--lagoon));
+    transform: scale(1.05);
+  }
+
+  .game-button:active {
+    transform: scale(0.95);
+  }
+
+  .game-screen {
+    display: none;
+  }
+
+  .visible {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* 📱 スマホ・タブレット対応 */
+  @media (max-width: 600px) {
     .title {
-      font-size: 3rem;
-      margin-bottom: 1rem;
+      font-size: 2.2rem;
     }
 
     .description {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
+      font-size: 1rem;
     }
 
     .game-button {
-      display: block;
-      width: 90%;
-      max-width: 300px;
-      margin: 0.7rem auto;
-      background-color: var(--lagoon);
-      color: var(--whitewash);
-      padding: 1rem;
-      border: none;
-      border-radius: 10px;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: transform 0.2s ease, background-color 0.3s ease;
+      font-size: 1rem;
+      padding: 0.9rem;
     }
-
-    .game-button:hover {
-      background-color: var(--saltwater);
-      transform: scale(1.05);
-    }
-
-    .game-button:active {
-      transform: scale(0.95);
-    }
-
-    .game-screen {
-      display: none;
-    }
-
-    .visible {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* 📱 スマホ・タブレット対応 */
-    @media (max-width: 600px) {
-      .title {
-        font-size: 2.2rem;
-      }
-
-      .description {
-        font-size: 1rem;
-      }
-
-      .game-button {
-        font-size: 1rem;
-        padding: 0.9rem;
-      }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Gravite</h1>
-    <p>ミニゲームで英文法を楽しく学ぼう！</p>
-  </header>
-
-  <div class="container" id="home">
-    <div class="title">ゲームを選ぼう</div>
-    <div class="description">好きなゲームを選んで、英文法力をアップしよう！</div>
-    <button class="game-button" onclick="startGame('fillInBlank')">穴埋めタイムアタック</button>
-    <button class="game-button" onclick="startGame('grammarSniper')">文法スナイパー</button>
-    <button class="game-button" onclick="startGame('shuffleChallenge')">並び替えチャレンジ</button>
-    <button class="game-button" onclick="startGame('trueFalse')">〇×判定ゲーム</button>
-  </div>
-
-  <div class="container game-screen" id="gameScreen">
-    <div id="gameTitle" class="title"></div>
-    <div id="gameContent" class="description">（ここにゲーム内容が表示されます）</div>
-    <button class="game-button" onclick="goHome()">ホームに戻る</button>
-  </div>
-
-  <script>
-    const clickSound = document.getElementById('click-sound');
-
-    function playSound() {
-      clickSound.currentTime = 0;
-      clickSound.play();
-    }
-
-    function startGame(gameId) {
-      playSound();
-      document.getElementById('home').style.display = 'none';
-      const gameScreen = document.getElementById('gameScreen');
-      gameScreen.classList.add('visible');
-
-      const titles = {
-        fillInBlank: '穴埋めタイムアタック',
-        grammarSniper: '文法スナイパー',
-        shuffleChallenge: '並び替えチャレンジ',
-        trueFalse: '〇×判定ゲーム'
-      };
-
-      document.getElementById('gameTitle').innerText = titles[gameId];
-      document.getElementById('gameContent').innerText = `（ここに「${titles[gameId]}」の問題が表示されます）`;
-    }
-
-    function goHome() {
-      playSound();
-      document.getElementById('gameScreen').classList.remove('visible');
-      document.getElementById('home').style.display = 'block';
-    }
-  </script>
-</body>
-</html>
+  }
+</style>
