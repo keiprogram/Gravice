@@ -2,11 +2,18 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Graplay - 英文法ミニゲーム</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gravite - 英文法ミニゲーム</title>
   <audio id="click-sound" src="./sounds/click.mp3" preload="auto"></audio>
 
   <style>
+    :root {
+      --saltwater: #257985;
+      --lagoon: #5EA8A7;
+      --whitewash: #FFFFFF;
+      --raspberry: #FF4447;
+    }
+
     @font-face {
       font-family: 'Kola';
       src: url('./fonts/Kola-Regular.woff2') format('woff2'),
@@ -15,54 +22,73 @@
       font-style: normal;
     }
 
-    body {
+    * {
       margin: 0;
-      font-family: 'Kola', 'Arial', sans-serif;
-      background-color: #FFFFFF;
-      color: #257985;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Kola', sans-serif;
+      background-color: var(--whitewash);
+      color: var(--saltwater);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
 
     header {
-      background-color: #257985;
-      color: white;
-      padding: 1rem;
+      background-color: var(--saltwater);
+      color: var(--whitewash);
       text-align: center;
-      animation: fadeInDown 1s ease;
+      padding: 2rem 1rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    header h1 {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
     }
 
     .container {
+      flex: 1;
+      padding: 2rem 1rem;
       max-width: 800px;
-      margin: 2rem auto;
-      padding: 1rem;
+      margin: 0 auto;
       text-align: center;
-      animation: fadeIn 1s ease;
     }
 
     .title {
-      font-size: 4rem;
+      font-size: 2.5rem;
       margin-bottom: 1rem;
     }
 
     .description {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       margin-bottom: 2rem;
+      color: var(--saltwater);
     }
 
     .game-button {
       display: inline-block;
-      background-color: #5EA8A7;
-      color: white;
+      background-color: var(--lagoon);
+      color: var(--whitewash);
+      border: none;
+      border-radius: 12px;
       padding: 1rem 2rem;
       margin: 0.5rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
+      font-size: 1.1rem;
       cursor: pointer;
-      transition: transform 0.2s ease, background-color 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .game-button:hover {
-      background-color: #257985;
+      background-color: var(--saltwater);
       transform: scale(1.05);
     }
 
@@ -78,26 +104,32 @@
       display: block;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .back-button {
+      background-color: var(--raspberry);
     }
 
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .back-button:hover {
+      background-color: #e13235;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      background-color: #f9f9f9;
+      color: #888;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Graplay</h1>
+    <h1>Gravite</h1>
     <p>ミニゲームで英文法を楽しく学ぼう！</p>
   </header>
 
   <div class="container" id="home">
     <div class="title">ゲームを選ぼう</div>
-    <div class="description">好きなゲームを選んで、英文法力をアップしよう！</div>
+    <p class="description">好きなゲームで文法力アップ！</p>
     <button class="game-button" onclick="playSound(); startGame('fillInBlank')">穴埋めタイムアタック</button>
     <button class="game-button" onclick="playSound(); startGame('grammarSniper')">文法スナイパー</button>
     <button class="game-button" onclick="playSound(); startGame('shuffleChallenge')">並び替えチャレンジ</button>
@@ -107,8 +139,12 @@
   <div class="container game-screen" id="gameScreen">
     <div id="gameTitle" class="title"></div>
     <div id="gameContent" class="description">（ここにゲーム内容が表示されます）</div>
-    <button class="game-button" onclick="playSound(); goHome()">ホームに戻る</button>
+    <button class="game-button back-button" onclick="playSound(); goHome()">ホームに戻る</button>
   </div>
+
+  <footer>
+    © 2025 Gravite | 英文法ゲームアプリ
+  </footer>
 
   <script>
     const clickSound = document.getElementById('click-sound');
