@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gravice - 英文法ミニゲーム</title>
-  <audio id="click-sound" src="./sounds/カーソル移動12.mp3" preload="auto"></audio>
 
   <style>
     :root {
@@ -13,7 +12,7 @@
       --whitewash: #FFFFFF;
       --raspberry: #FF4447;
     }
-  
+
     body {
       margin: 0;
       font-family: 'Kola', 'Arial', sans-serif;
@@ -23,14 +22,14 @@
       flex-direction: column;
       min-height: 100vh;
     }
-  
+
     header {
       background-color: var(--saltwater);
       color: var(--whitewash);
       padding: 1rem;
       text-align: center;
     }
-  
+
     .container {
       flex: 1;
       max-width: 800px;
@@ -38,17 +37,17 @@
       padding: 1rem;
       text-align: center;
     }
-  
+
     .title {
       font-size: 3rem;
       margin-bottom: 1rem;
     }
-  
+
     .description {
       font-size: 1.2rem;
       margin-bottom: 2rem;
     }
-  
+
     .game-button {
       display: block;
       width: 90%;
@@ -63,42 +62,45 @@
       cursor: pointer;
       transition: transform 0.2s ease, background-color 0.3s ease;
     }
-  
+
     .game-button:hover {
       background-color: var(--raspberry);
       transform: scale(1.05);
     }
-  
+
     .game-button:active {
       transform: scale(0.95);
     }
-  
+
     .game-screen {
       display: none;
     }
-  
+
     .visible {
       display: block;
     }
-  
+
     @media (max-width: 600px) {
       .title {
         font-size: 2.2rem;
       }
-  
+
       .description {
         font-size: 1rem;
       }
-  
+
       .game-button {
         font-size: 1rem;
         padding: 0.9rem;
       }
     }
   </style>
-  
 </head>
 <body>
+
+  <!-- ✅ ここにaudioタグを移動 -->
+  <audio id="click-sound" src="./sounds/カーソル移動12.mp3" preload="auto"></audio>
+
   <header>
     <h1>Gravice</h1>
     <p>ミニゲームで英文法を楽しく学ぼう！</p>
@@ -123,8 +125,12 @@
     const clickSound = document.getElementById('click-sound');
 
     function playSound() {
-      clickSound.currentTime = 0;
-      clickSound.play();
+      if (clickSound) {
+        clickSound.currentTime = 0;
+        clickSound.play().catch((e) => {
+          console.warn("クリック音の再生に失敗しました:", e);
+        });
+      }
     }
 
     function startGame(gameId) {
