@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gravice - 英文法ミニゲーム</title>
 
+  <!-- Google Fonts: Doto -->
+  <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet" />
+
   <style>
     :root {
       --saltwater: #257985;
@@ -15,7 +18,8 @@
 
     body {
       margin: 0;
-      font-family: 'Kola', 'Arial', sans-serif;
+      font-family: 'Doto', 'Arial', sans-serif;
+      font-weight: 400;
       background-color: var(--whitewash);
       color: var(--saltwater);
       display: flex;
@@ -30,6 +34,11 @@
       text-align: center;
     }
 
+    header h1 {
+      font-weight: 700;
+      margin: 0;
+    }
+
     .container {
       flex: 1;
       max-width: 800px;
@@ -41,11 +50,13 @@
     .title {
       font-size: 3rem;
       margin-bottom: 1rem;
+      font-weight: 700;
     }
 
     .description {
       font-size: 1.2rem;
       margin-bottom: 2rem;
+      font-weight: 400;
     }
 
     .game-button {
@@ -59,6 +70,7 @@
       border: none;
       border-radius: 10px;
       font-size: 1.1rem;
+      font-weight: 700;
       cursor: pointer;
       transition: transform 0.2s ease, background-color 0.3s ease;
     }
@@ -98,7 +110,7 @@
 </head>
 <body>
 
-  <!-- ✅ ここにaudioタグを移動 -->
+  <!-- クリック音 -->
   <audio id="click-sound" src="./sounds/click.mp3" preload="auto"></audio>
 
   <header>
