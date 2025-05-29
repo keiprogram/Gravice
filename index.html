@@ -241,7 +241,7 @@
     <button class="game-button" onclick="startGame('fillInBlank')">穴埋めタイムアタック</button>
     <button class="game-button" onclick="startGame('grammarSniper')">文法スナイパー</button>
     <button class="game-button" onclick="startGame('shuffleChallenge')">並び替えチャレンジ</button>
-    <button class="game-button" onclick="startGame('trueFalse')">〇×判定ゲーム</button>
+    <button class="game-button"onclick="startGame('trueFalse')">〇×判定ゲーム</button>
   </div>
 
   <div class="container game-screen" id="gameScreen">
@@ -377,6 +377,37 @@
       { sentence: "I’ll help you ___ you need it.", answer: "because", category: "接続詞", translation: "あなたが必要なら、私は助けます。", grade: "3" }
     ];
 
+    // 文法カテゴリーのリスト（初期表示用）
+    const allCategories = [
+      { value: "all", text: "すべての文法" },
+      { value: "be動詞", text: "be動詞" },
+      { value: "一般動詞", text: "一般動詞" },
+      { value: "疑問文・否定文", text: "疑問文・否定文" },
+      { value: "代名詞", text: "代名詞" },
+      { value: "命令文", text: "命令文" },
+      { value: "感嘆文", text: "感嘆文" },
+      { value: "現在進行形", text: "現在進行形" },
+      { value: "can", text: "can" },
+      { value: "短縮形", text: "短縮形" },
+      { value: "複数形", text: "複数形" },
+      { value: "過去形", text: "過去形" },
+      { value: "未来表現", text: "未来表現" },
+      { value: "助動詞", text: "助動詞" },
+      { value: "比較", text: "比較" },
+      { value: "不定詞", text: "不定詞" },
+      { value: "動名詞", text: "動名詞" },
+      { value: "There構文", text: "There構文" },
+      { value: "疑問詞", text: "疑問詞" },
+      { value: "現在完了", text: "現在完了" },
+      { value: "受動態", text: "受動態" },
+      { value: "関係代名詞", text: "関係代名詞" },
+      { value: "間接疑問文", text: "間接疑問文" },
+      { value: "現在分詞", text: "現在分詞" },
+      { value: "過去分詞", text: "過去分詞" },
+      { value: "接続詞", text: "接続詞" },
+      { value: "仮定法", text: "仮定法" }
+    ];
+
     function playSound() {
       if (clickSound) {
         clickSound.currentTime = 0;
@@ -384,6 +415,30 @@
           console.warn("クリック音の再生に失敗しました:", e);
         });
       }
+    }
+
+    function updateCategoryOptions() {
+      const grade = document.getElementById('gradeSelector').value;
+      const categorySelector = document.getElementById('categorySelector');
+      categorySelector.innerHTML = ''; // 既存のオプションをクリア
+
+      // 学年に基づいて利用可能なカテゴリーをフィルタリング
+      let availableCategories = allCategories;
+      if (grade !== 'all') {
+        const validCategories = [...new Set(questions.filter(q => q.grade === grade).map(q => q.category))];
+        availableCategories = allCategories.filter(cat => cat.value === 'all' || validCategories.includes(cat.value));
+      }
+
+      // カテゴリーオプションを追加
+      availableCategories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.value;
+        option.text = cat.text;
+        if (cat.value === 'all') {
+          option.selected = true; // デフォルトで「すべての文法」を選択
+        }
+        categorySelector.appendChild(option);
+      });
     }
 
     function startGame(gameId) {
@@ -526,6 +581,15 @@
       document.getElementById('answerInput').style.display = 'block';
       document.querySelector('.game-button[onclick="checkAnswer()"]').style.display = 'block';
     }
+
+    // 学年選択時にカテゴリーオプションを更新
+    document.getElementById('gradeSelector').addEventListener('change', () => {
+      updateCategoryOptions();
+      playSound();
+    });
+
+    // 初期カテゴリーオプションを設定
+    updateCategoryOptions();
 
     // Enterキーで回答送信
     document.getElementById('answerInput').addEventListener('keypress', (e) => {
