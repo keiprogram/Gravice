@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gravice - 英文法ミニゲーム</title>
 
-  <!-- Google Fonts: Doto -->
-  <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- Google Fonts: Noto Sans JP (Dotoは存在しないため、Noto Sans JPに変更) -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet" />
 
   <style>
     :root {
@@ -18,7 +18,7 @@
 
     body {
       margin: 0;
-      font-family: 'Doto', 'Arial', sans-serif;
+      font-family: 'Noto Sans JP', 'Arial', sans-serif;
       font-weight: 400;
       background-color: var(--whitewash);
       color: var(--saltwater);
@@ -92,6 +92,43 @@
       display: block;
     }
 
+    #gameContent {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #question {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    #answerInput {
+      padding: 0.5rem;
+      font-size: 1.1rem;
+      width: 200px;
+      margin-bottom: 1rem;
+      border: 2px solid var(--saltwater);
+      border-radius: 5px;
+    }
+
+    #feedback {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      color: var(--raspberry);
+    }
+
+    #score, #timer {
+      font-size: 1.2rem;
+      margin: 0.5rem;
+    }
+
+    #resultScreen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
     @media (max-width: 600px) {
       .title {
         font-size: 2.2rem;
@@ -105,12 +142,20 @@
         font-size: 1rem;
         padding: 0.9rem;
       }
+
+      #question {
+        font-size: 1.3rem;
+      }
+
+      #answerInput {
+        width: 150px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- クリック音 -->
+  <!-- クリック音（実際のファイルは必要に応じて用意） -->
   <audio id="click-sound" src="./sounds/click.mp3" preload="auto"></audio>
 
   <header>
@@ -129,12 +174,133 @@
 
   <div class="container game-screen" id="gameScreen">
     <div id="gameTitle" class="title"></div>
-    <div id="gameContent" class="description">（ここにゲーム内容が表示されます）</div>
-    <button class="game-button" onclick="goHome()">ホームに戻る</button>
+    <div id="gameContent" class="description">
+      <div id="score">スコア: 0</div>
+      <div id="timer">残り時間: 60秒</div>
+      <div id="question"></div>
+      <input type="text" id="answerInput" placeholder="回答を入力" />
+      <button class="game-button" onclick="checkAnswer()">回答</button>
+      <div id="feedback"></div>
+      <div id="resultScreen">
+        <div id="resultMessage" class="description"></div>
+        <button class="game-button" onclick="startGame('fillInBlank')">もう一度プレイ</button>
+        <button class="game-button" onclick="goHome()">ホームに戻る</button>
+      </div>
+    </div>
   </div>
 
   <script>
     const clickSound = document.getElementById('click-sound');
+    let score = 0;
+    let timeLeft = 60;
+    let timerId;
+    let currentQuestion = null;
+
+    // 問題データ（中学1〜3年の例文）
+    const questions = [
+      // 中1: be動詞
+      { sentence: "She ___ a student.", answer: "is", category: "be動詞" },
+      { sentence: "They ___ in the park.", answer: "are", category: "be動詞" },
+      { sentence: "I ___ happy today.", answer: "am", category: "be動詞" },
+      { sentence: "___ he a teacher?", answer: "Is", category: "be動詞" },
+      { sentence: "We ___ tired.", answer: "aren’t", category: "be動詞" },
+      // 中1: 一般動詞
+      { sentence: "I ___ soccer every day.", answer: "play", category: "一般動詞" },
+      { sentence: "He ___ chocolate.", answer: "likes", category: "一般動詞" },
+      { sentence: "___ she study English?", answer: "Does", category: "一般動詞" },
+      { sentence: "We ___ watch TV.", answer: "don’t", category: "一般動詞" },
+      { sentence: "They ___ their grandparents on Sundays.", answer: "visit", category: "一般動詞" },
+      // 中1: 疑問文・否定文の作り方
+      { sentence: "___ you like pizza?", answer: "Do", category: "疑問文・否定文" },
+      { sentence: "She ___ go to school on weekends.", answer: "doesn’t", category: "疑問文・否定文" },
+      { sentence: "___ it raining now?", answer: "Is", category: "疑問文・否定文" },
+      { sentence: "He ___ coming to the party.", answer: "isn’t", category: "疑問文・否定文" },
+      { sentence: "___ Tom play tennis?", answer: "Does", category: "疑問文・否定文" },
+      // 中1: 代名詞・命令文・感嘆文
+      { sentence: "___ me the book.", answer: "Give", category: "命令文" },
+      { sentence: "___ a beautiful flower!", answer: "What", category: "感嘆文" },
+      { sentence: "This is ___ bag.", answer: "my", category: "代名詞" },
+      { sentence: "___ run in the classroom.", answer: "Don’t", category: "命令文" },
+      { sentence: "___ cute the puppy is!", answer: "How", category: "感嘆文" },
+      // 中1: 現在進行形・can
+      { sentence: "I ___ reading a book now.", answer: "am", category: "現在進行形" },
+      { sentence: "She ___ swim very well.", answer: "can", category: "can" },
+      { sentence: "They ___ playing soccer in the park.", answer: "are", category: "現在進行形" },
+      { sentence: "___ you help me?", answer: "Can", category: "can" },
+      { sentence: "He ___ running fast.", answer: "is", category: "現在進行形" },
+      // 中1: 短縮形・複数形
+      { sentence: "___ a student.", answer: "I’m", category: "短縮形" },
+      { sentence: "There are two ___ in the house.", answer: "cats", category: "複数形" },
+      { sentence: "She ___ like coffee.", answer: "doesn’t", category: "短縮形" },
+      { sentence: "I have three ___.", answer: "books", category: "複数形" },
+      { sentence: "They ___ here.", answer: "aren’t", category: "短縮形" },
+      // 中2: 過去形
+      { sentence: "I ___ to the zoo yesterday.", answer: "went", category: "過去形" },
+      { sentence: "She ___ a new dress.", answer: "bought", category: "過去形" },
+      { sentence: "Did you ___ the movie?", answer: "see", category: "過去形" },
+      { sentence: "We ___ play soccer last week.", answer: "didn’t", category: "過去形" },
+      { sentence: "He ___ tired after school.", answer: "was", category: "過去形" },
+      // 中2: 未来表現
+      { sentence: "I ___ call you later.", answer: "will", category: "未来表現" },
+      { sentence: "She ___ going to visit her grandma tomorrow.", answer: "is", category: "未来表現" },
+      { sentence: "___ you come to the party?", answer: "Will", category: "未来表現" },
+      { sentence: "They ___ going to study English tonight.", answer: "are", category: "未来表現" },
+      { sentence: "It ___ rain this afternoon.", answer: "will", category: "未来表現" },
+      // 中2: 助動詞
+      { sentence: "You ___ finish your homework.", answer: "must", category: "助動詞" },
+      { sentence: "I ___ to clean my room.", answer: "have", category: "助動詞" },
+      { sentence: "She ___ be quiet in the library.", answer: "must", category: "助動詞" },
+      { sentence: "We ___ have to go to school tomorrow.", answer: "don’t", category: "助動詞" },
+      { sentence: "He ___ study harder.", answer: "should", category: "助動詞" },
+      // 中2: 比較
+      { sentence: "This book is ___ interesting than that one.", answer: "more", category: "比較" },
+      { sentence: "She is the ___ girl in the class.", answer: "tallest", category: "比較" },
+      { sentence: "My bag is ___ than yours.", answer: "heavier", category: "比較" },
+      { sentence: "This is the ___ beautiful park in the city.", answer: "most", category: "比較" },
+      { sentence: "He runs ___ than his brother.", answer: "faster", category: "比較" },
+      // 中2: 不定詞
+      { sentence: "I want ___ learn English.", answer: "to", category: "不定詞" },
+      { sentence: "This is a good book ___ read.", answer: "to", category: "不定詞" },
+      { sentence: "She came here ___ meet her friend.", answer: "to", category: "不定詞" },
+      { sentence: "He needs a pen ___ write with.", answer: "to", category: "不定詞" },
+      { sentence: "I study hard ___ pass the test.", answer: "to", category: "不定詞" },
+      // 中2: 動名詞・There構文・疑問詞
+      { sentence: "I enjoy ___ soccer.", answer: "playing", category: "動名詞" },
+      { sentence: "___ is a cat in the garden.", answer: "There", category: "There構文" },
+      { sentence: "___ is your name?", answer: "What", category: "疑問詞" },
+      { sentence: "She likes ___ songs.", answer: "singing", category: "動名詞" },
+      { sentence: "___ do you live?", answer: "Where", category: "疑問詞" },
+      // 中3: 現在完了
+      { sentence: "I ___ lived here for five years.", answer: "have", category: "現在完了" },
+      { sentence: "She ___ been to Paris twice.", answer: "has", category: "現在完了" },
+      { sentence: "We ___ just finished our homework.", answer: "have", category: "現在完了" },
+      { sentence: "He ___ lost his keys.", answer: "has", category: "現在完了" },
+      { sentence: "They ___ known each other since childhood.", answer: "have", category: "現在完了" },
+      // 中3: 受動態
+      { sentence: "This book ___ written by a famous author.", answer: "was", category: "受動態" },
+      { sentence: "The room ___ cleaned every day.", answer: "is", category: "受動態" },
+      { sentence: "The cake ___ eaten by the children.", answer: "was", category: "受動態" },
+      { sentence: "English ___ spoken all over the world.", answer: "is", category: "受動態" },
+      { sentence: "The house ___ be painted next week.", answer: "will", category: "受動態" },
+      // 中3: 関係代名詞
+      { sentence: "This is the boy ___ helped me.", answer: "who", category: "関係代名詞" },
+      { sentence: "The book ___ I read was interesting.", answer: "which", category: "関係代名詞" },
+      { sentence: "She is the girl ___ bag is red.", answer: "whose", category: "関係代名詞" },
+      { sentence: "The park ___ we played is beautiful.", answer: "where", category: "関係代名詞" },
+      { sentence: "I know the man ___ lives next door.", answer: "who", category: "関係代名詞" },
+      // 中3: 間接疑問文・分詞
+      { sentence: "I wonder ___ she lives.", answer: "where", category: "間接疑問文" },
+      { sentence: "The ___ cat is cute.", answer: "sleeping", category: "現在分詞" },
+      { sentence: "The ___ chair is in the room.", answer: "broken", category: "過去分詞" },
+      { sentence: "Do you know ___ time it is?", answer: "what", category: "間接疑問文" },
+      { sentence: "The ___ bird is beautiful.", answer: "singing", category: "現在分詞" },
+      // 中3: 接続詞・仮定法
+      { sentence: "I’ll call you ___ I have time.", answer: "if", category: "接続詞" },
+      { sentence: "___ I were rich, I would travel the world.", answer: "If", category: "仮定法" },
+      { sentence: "She was tired, ___ she finished her work.", answer: "but", category: "接続詞" },
+      { sentence: "___ it rains, we won’t go out.", answer: "If", category: "仮定法" },
+      { sentence: "I’ll help you ___ you need it.", answer: "because", category: "接続詞" }
+    ];
 
     function playSound() {
       if (clickSound) {
@@ -159,14 +325,108 @@
       };
 
       document.getElementById('gameTitle').innerText = titles[gameId];
-      document.getElementById('gameContent').innerText = `（ここに「${titles[gameId]}」の問題が表示されます）`;
+      if (gameId === 'fillInBlank') {
+        startFillInBlank();
+      } else {
+        document.getElementById('gameContent').innerText = `（ここに「${titles[gameId]}」の問題が表示されます）`;
+      }
     }
 
     function goHome() {
       playSound();
+      clearInterval(timerId);
       document.getElementById('gameScreen').classList.remove('visible');
       document.getElementById('home').style.display = 'block';
+      resetGame();
     }
+
+    function startFillInBlank() {
+      score = 0;
+      timeLeft = 60;
+      document.getElementById('score').innerText = `スコア: ${score}`;
+      document.getElementById('timer').innerText = `残り時間: ${timeLeft}秒`;
+      document.getElementById('resultScreen').style.display = 'none';
+      document.getElementById('answerInput').style.display = 'block';
+      document.getElementById('answerInput').value = '';
+      document.getElementById('feedback').innerText = '';
+      document.querySelector('.game-button[onclick="checkAnswer()"]').style.display = 'block';
+      nextQuestion();
+      startTimer();
+    }
+
+    function nextQuestion() {
+      const randomIndex = Math.floor(Math.random() * questions.length);
+      currentQuestion = questions[randomIndex];
+      document.getElementById('question').innerText = currentQuestion.sentence;
+      document.getElementById('answerInput').value = '';
+      document.getElementById('answerInput').focus();
+    }
+
+    function checkAnswer() {
+      playSound();
+      const userAnswer = document.getElementById('answerInput').value.trim().toLowerCase();
+      const correctAnswer = currentQuestion.answer.toLowerCase();
+      const feedback = document.getElementById('feedback');
+
+      if (userAnswer === correctAnswer) {
+        score += 10;
+        document.getElementById('score').innerText = `スコア: ${score}`;
+        feedback.innerText = '正解！';
+        feedback.style.color = 'green';
+        setTimeout(() => {
+          feedback.innerText = '';
+          nextQuestion();
+        }, 1000);
+      } else {
+        feedback.innerText = `不正解！正解は「${currentQuestion.answer}」です。`;
+        feedback.style.color = 'var(--raspberry)';
+        setTimeout(() => {
+          feedback.innerText = '';
+          nextQuestion();
+        }, 1500);
+      }
+    }
+
+    function startTimer() {
+      timerId = setInterval(() => {
+        timeLeft--;
+        document.getElementById('timer').innerText = `残り時間: ${timeLeft}秒`;
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      document.getElementById('question').innerText = '';
+      document.getElementById('answerInput').style.display = 'none';
+      document.querySelector('.game-button[onclick="checkAnswer()"]').style.display = 'none';
+      document.getElementById('feedback').innerText = '';
+      document.getElementById('resultScreen').style.display = 'flex';
+      document.getElementById('resultMessage').innerText = `ゲーム終了！あなたのスコアは ${score} 点（${score / 10} 問正解）です！`;
+    }
+
+    function resetGame() {
+      score = 0;
+      timeLeft = 60;
+      currentQuestion = null;
+      document.getElementById('score').innerText = `スコア: ${score}`;
+      document.getElementById('timer').innerText = `残り時間: ${timeLeft}秒`;
+      document.getElementById('question').innerText = '';
+      document.getElementById('answerInput').value = '';
+      document.getElementById('feedback').innerText = '';
+      document.getElementById('resultScreen').style.display = 'none';
+      document.getElementById('answerInput').style.display = 'block';
+      document.querySelector('.game-button[onclick="checkAnswer()"]').style.display = 'block';
+    }
+
+    // Enterキーで回答送信
+    document.getElementById('answerInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        checkAnswer();
+      }
+    });
   </script>
 </body>
 </html>
